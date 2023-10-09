@@ -1,0 +1,215 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>gtmtodo</title>
+    <link rel="stylesheet" href="{% static 'index.css' %}">
+</head>
+<body>
+    <header>
+        <h1>GTM TODO</h1>
+            <nav>
+                <ul>
+                    <li><a href="/logout">Log Out</a></li>
+                </ul>
+            </nav>
+    </header>
+        <main>
+            <section id="post-form">
+                <form action="todo_create" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="text" name="title" placeholder="Todo Name" required>
+                    <input type="text" name="description" placeholder="Ddescription">
+                    <label>Due date :</label>
+                    <input type="date" name="due_date" required>
+                    <button type="submit">Add</button>
+                </form><br>
+                <button type="submit" onclick="showAll()">All</button>
+                <button type="submit" id="pending_button">Pending</button>
+                <button type="submit" id="checked_button">Checked</button>
+                <button type="submit" id="expired_button">Expired</button>
+            </section><br>
+            <div id="allTodo" style="display: block;">
+                    {% for todo in todos reversed %}
+                    <section id="post-list">
+                        <article class="post">
+                            <div class="post-content">
+                                </h1> {{ todo.title }}</h1>
+                                <h5>{{ todo.description }}</h5>
+                                {% if todo.completed %}
+                                <h5> Checked</h5>
+                                {% else %}
+                                <form action="todo_check" method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}    
+                                    <label>End Todo</label>
+                                    <input type="hidden" name="todo_id" value="{{ todo.id }}">
+                                    <input type="hidden" name="completed" value="off">
+                                    <input type="checkbox" name="completed" {% if todo.completed %} checked {% endif %}>
+                                    <button type="submit">Update</button>
+                                </form>
+                                {% endif %}
+                                <h6>Due date : {{ todo.due_date}}</h6>
+                            </div>
+                            <section id="post-form">
+                                <button class="addContentButton" data-target="{{ todo.id }}">Edit</button><br><br>
+                                <div class="extraContentContainer" id="extraContentContainer-{{ todo.id }}" style="display: none;">
+                                    <section id="post-form">
+                                        <form action="todo_update" method="POST" enctype="multipart/form-data">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="todo_id" value="{{ todo.id }}">
+                                            <input type="text" name="title" placeholder="Name" value="{{ todo.title }}">
+                                            <input type="text" name="description" placeholder="Description" value="{{ todo.description }}">
+                                            <input type="date" name="due_date" value="{{ todo.due_date }}">
+                                            <label>Completed</label>
+                                            <input type="hidden" name="completed" value="off">
+                                            <input type="checkbox" name="completed" {% if todo.completed %} checked {% endif %}>
+                                            <button type="submit">Update</button>
+                                            <button type="button" onclick="showAll()">Cancel</button>
+                                        </form>
+                                    </section>
+                                </div>
+                                <form method="post" action="todo_delete" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="todo_id" value="{{ todo.id }}">
+                                    <button type="submit">Delete</button>
+                                </form>
+                            </section>
+                        </article>
+                    </section>
+                {% endfor %} 
+            </div>
+
+            <div id="pending" style="display: none;">
+                <h5>Pending</h5>
+                {% for pendingtodo in pendingtodos reversed %}
+                <section id="post-list">
+                    <article class="post">
+                        <div class="post-content">
+                            </h1> {{ pendingtodo.title }}</h1>
+                            <h5>{{ pendingtodo.description }}</h5>
+                            {% if pendingtodo.completed %}
+                            <h5> Checked</h5>
+                            {% else %}
+                            <form action="todo_check" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}    
+                                <label>End Todo</label>
+                                <input type="hidden" name="todo_id" value="{{ pendingtodo.id }}">
+                                <input type="hidden" name="completed" value="off">
+                                <input type="checkbox" name="completed" {% if pendingtodo.completed %} checked {% endif %}>
+                                <button type="submit">Update</button>
+                            </form>
+                            {% endif %}
+                            <h6>Due date : {{ pendingtodo.due_date}}</h6>
+                        </div>
+                    </article>
+                </section>
+                {% endfor %}
+            </div>
+
+            <div id="checked" style="display: none;">
+                <h5>Checked</h5>
+                {% for checkedtod in checkedtods reversed %}
+                <section id="post-list">
+                    <article class="post">
+                        <div class="post-content">
+                            </h1> {{ checkedtod.title }}</h1>
+                            <h5>{{ checkedtod.description }}</h5>
+                            {% if checkedtod.completed %}
+                            <h5> Checked</h5>
+                            {% endif %}
+                            <h6>Due date : {{ checkedtod.due_date}}</h6>
+                        </div>
+                    </article>
+                </section>
+                {% endfor %}
+            </div>
+            <div id="expired" style="display: none;">
+                <h5>Expired</h5>
+                {% for expiredtodo in expiredtodos reversed %}
+                <section id="post-list">
+                    <article class="post">
+                        <div class="post-content">
+                            </h1> {{ expiredtodo.title }}</h1>
+                            <h5>{{ expiredtodo.description }}</h5>
+                            {% if expiredtodo.completed %}
+                            <h5>Checked</h5>
+                            {% else %}
+                            <h5>Unchecked</h5>
+                            {% endif %}
+                            <h6>Due date : {{ expiredtodo.due_date}}</h6>
+                        </div>
+                    </article>
+                </section>
+                {% endfor %}
+            </div>
+        </main>
+        <script>
+            function showAll() {
+                window.location.reload();
+            }
+
+            document.addEventListener("DOMContentLoaded", function () {
+                const addContentButtons = document.querySelectorAll(".addContentButton");
+                
+                addContentButtons.forEach(function (button) {
+                    button.addEventListener("click", function () {
+                        const objectId = button.getAttribute("data-target");
+                        const extraContentContainer = document.getElementById(`extraContentContainer-${objectId}`);
+
+                        extraContentContainer.style.display = "block";
+                    });
+                });
+            });
+
+
+            document.addEventListener("DOMContentLoaded", function () {
+                const pendindButton = document.getElementById("pending_button");
+                const allTodoDiv = document.getElementById("allTodo");
+                const pendingDiv = document.getElementById("pending");
+                const checkedDiv = document.getElementById("checked");
+                const expiredDiv = document.getElementById("expired");
+
+                pendindButton.addEventListener("click", function () {
+                    allTodoDiv.style.display = "none";
+                    pendingDiv.style.display = "block";
+                    checkedDiv.style.display = "none";
+                    expiredDiv.style.display = "none";
+                });
+            });
+
+            document.addEventListener("DOMContentLoaded", function () {
+                const pendindButton = document.getElementById("checked_button");
+                const allTodoDiv = document.getElementById("allTodo");
+                const pendingDiv = document.getElementById("pending");
+                const checkedDiv = document.getElementById("checked");
+                const expiredDiv = document.getElementById("expired");
+
+                pendindButton.addEventListener("click", function () {
+                    allTodoDiv.style.display = "none";
+                    pendingDiv.style.display = "none";
+                    checkedDiv.style.display = "block";
+                    expiredDiv.style.display = "none";
+                });
+            });
+
+            document.addEventListener("DOMContentLoaded", function () {
+                const pendindButton = document.getElementById("expired_button");
+                const allTodoDiv = document.getElementById("allTodo");
+                const pendingDiv = document.getElementById("pending");
+                const checkedDiv = document.getElementById("checked");
+                const expiredDiv = document.getElementById("expired");
+
+                pendindButton.addEventListener("click", function () {
+                    allTodoDiv.style.display = "none";
+                    pendingDiv.style.display = "none";
+                    checkedDiv.style.display = "none";
+                    expiredDiv.style.display = "block";
+                });
+            });
+        </script>
+</body>
+</html>
