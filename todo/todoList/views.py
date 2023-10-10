@@ -6,7 +6,9 @@ from .models import todoCharts
 from django.db.models import Q
 from django.utils import timezone
 
-# Create your views here.
+# Create your views here.\
+
+#index page
 @login_required(login_url='signin')
 def index(request):
     current_datetime = timezone.now()
@@ -22,6 +24,7 @@ def index(request):
         'expiredtodos':expiredtodos
         })
 
+#to create a todos list
 @login_required(login_url='signin')
 def todo_create(request):
     if request.method == 'POST':
@@ -32,6 +35,7 @@ def todo_create(request):
         todo.save()
         return redirect('/')
     
+#feture to make a todo completed
 @login_required(login_url='signin')
 def todo_check(request):
     todo_id = request.POST['todo_id']
@@ -43,7 +47,7 @@ def todo_check(request):
     todo.save()
     return redirect('/')
 
-
+#to uodate the todo list
 @login_required(login_url='signin')
 def todo_update(request):    
     if request.method == 'POST':
@@ -64,7 +68,7 @@ def todo_update(request):
         todo.title=title
         todo.save()
         return redirect('/')
-
+#to delete the todo
 @login_required(login_url='signin')
 def todo_delete(request):
     if request.method == 'POST':
@@ -73,6 +77,7 @@ def todo_delete(request):
         todo.delete()
         return redirect('/')
 
+#logout functionality
 @login_required(login_url='signin')
 def logout(request):
     auth.logout(request)
