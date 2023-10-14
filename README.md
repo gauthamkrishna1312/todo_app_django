@@ -82,7 +82,7 @@ The development server will run locally at http://localhost:8000/. You can acces
 * View tasks by different categories using the navigation buttons.
 
 ### Live Demo
-### A live demo of the GTM TODO App is available at https://yourappurl.com
+### A live demo of the GTM TODO App is available at https://gtmtodo.onrender.com
 
 # License
 This project is licensed under the MIT License - see the LICENSE file for details.
