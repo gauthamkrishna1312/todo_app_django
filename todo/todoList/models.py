@@ -7,6 +7,7 @@ from django.utils import timezone
 User = get_user_model()
 
 class todoCharts(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # user who created the todo.
     title = models.CharField(max_length=200,)
     description = models.TextField(null=True)
     completed = models.BooleanField(default=False)
