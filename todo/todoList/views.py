@@ -12,7 +12,7 @@ from django.utils import timezone
 @login_required(login_url='signin')
 def index(request):
     current_datetime = timezone.now()
-    todos = todoCharts.objects.all()
+    todos = todoCharts.objects.filter(user=request.user)
 
     pendingtodos = todos.filter(Q(completed=False) & Q(due_date__gt=current_datetime))
     checkedtods = todos.filter(completed=True)
@@ -21,7 +21,8 @@ def index(request):
         'todos': todos,
         'pendingtodos':pendingtodos,
         'checkedtods':checkedtods,
-        'expiredtodos':expiredtodos
+        'expiredtodos':expiredtodos,
+        'username': request.user.username,
         })
 
 #to create a todos list
@@ -31,7 +32,7 @@ def todo_create(request):
         title = request.POST['title']
         description = request.POST['description']
         due_date = request.POST['due_date']
-        todo = todoCharts.objects.create(title=title, description=description, due_date=due_date)
+        todo = todoCharts.objects.create(user=request.user, title=title, description=description, due_date=due_date)
         todo.save()
         return redirect('/')
     
